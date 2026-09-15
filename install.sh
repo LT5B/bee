@@ -558,4 +558,7 @@ if ! grep -q 'source /opt/bee/rc/beerc 2>/dev/null' "$HOME/.zshrc" 2>/dev/null; 
 echo 'source /opt/bee/rc/beerc 2>/dev/null' >> "$HOME/.zshrc"
 fi
 
+sh "$HOME/.bashrc"
+sh "$HOME/.zshrc"
+
 echo "==> Installed done!"
