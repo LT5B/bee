@@ -1,23 +1,14 @@
 #!/bin/bash
 
-echo "==> Making folder..."
-sudo mkdir -p "/opt/bee"
-sudo mkdir -p "/opt/bee/bin"
-sudo mkdir -p "/opt/bee/cellar"
-sudo mkdir -p "/opt/bee/doc"
-sudo mkdir -p "/opt/bee/applications"
-sudo mkdir -p "/opt/bee/project"
-sudo mkdir -p "/opt/bee/packdoc"
-sudo mkdir -p "/opt/bee/rc"
-sudo mkdir -p "/opt/bee/admin/packages"
-sudo mkdir -p "/opt/bee/library/packages"
+echo "==> Making folders..."
+sudo mkdir -p /opt/bee/{bin,cellar,doc,applications,project,packdoc,rc,admin/packages,library/packages}
 
 echo "==> Making RC..."
-sudo touch "/opt/bee/rc/beerc"
-sudo chmod 666 "/opt/bee/rc/beerc"
+sudo touch /opt/bee/rc/beerc
+sudo chmod 666 /opt/bee/rc/beerc
 
 echo "==> Making executable file..."
-sudo tee "/opt/bee/bin/bee" > /dev/null << 'EOF'
+sudo tee /opt/bee/bin/bee > /dev/null << 'EOF'
 #!/bin/bash
 
 if [ -z "$1" ]; then
@@ -28,12 +19,13 @@ fi
 case "$1" in
     "install")
         if [ -z "$2" ]; then
-            echo "Usage: bee install <package_name>"
+            echo "Usage: bee install [package_name]"
             exit 1
         fi
 
         PACKAGE_NAME="$2"
         REAL_USER="${SUDO_USER:-$USER}"
+
         SOURCE_FILE="/opt/bee/admin/packages/${PACKAGE_NAME}.sh"
         TARGET_DIR="/opt/bee/library/packages"
         TARGET_FILE="${TARGET_DIR}/${PACKAGE_NAME}.sh"
@@ -56,35 +48,22 @@ case "$1" in
         if [ "$(uname -s)" = "Darwin" ]; then
             case "$macos" in
                 "yes"|"true"|"t"|"y")
-                    if [ -n "$homepage" ]; then
-                        echo "View all on $homepage"
-                    fi
-                    if [ -n "$discord" ]; then
-                        echo "Join my discord server -> $discord"
-                    fi
-        
+                    if [ -n "$homepage" ]; then echo "View all on $homepage"; fi
+                    if [ -n "$discord" ]; then echo "Join my discord server -> $discord"; fi
+                    
                     curl -s -L -R -O "$bin" "/opt/bee/cellar/$2.tgz"
-                    tar zxf "/opt/bee/cellar/$2.tgz" -C "/opt/bee/cellar/"
+                    tar zxf "/opt/bee/cellar/$2.tgz" -C "/opt/bee/cellar"
                     rm "/opt/bee/cellar/$2.tgz"
 
                     sudo mkdir -p "/opt/bee/packdoc/$2"
-
-                    if [ -n "$license" ]; then
-                        sudo curl -O "$license" "/opt/bee/packdoc/$2/license.md"
-                    fi
-                    if [ -n "$readme" ]; then
-                        sudo curl -O "$readme" "/opt/bee/packdoc/$2/readme.md"
-                    fi
-                    if [ -n "$manual" ]; then
-                        sudo curl -O "$manual" "/usr/local/share/man1/$2.1"
-                    fi
-                    if [ -n "$agents" ]; then
-                        sudo curl -O "$agents" "/opt/bee/packdoc/$2/agents.md"
-                    fi
+                    if [ -n "$license" ]; then sudo curl -O "$license" "/opt/bee/packdoc/$2/license.md"; fi
+                    if [ -n "$readme" ]; then sudo curl -O "$readme" "/opt/bee/packdoc/$2/readme.md"; fi
+                    if [ -n "$manual" ]; then sudo curl -O "$manual" "/usr/local/share/man1/$2.1"; fi
+                    if [ -n "$agents" ]; then sudo curl -O "$agents" "/opt/bee/packdoc/$2/agents.md"; fi
 
                     if [ -d "/opt/bee/cellar/$2/bin" ]; then
                         chmod -R +x "/opt/bee/cellar/$2/bin"
-                        echo 'export PATH="$PATH:/opt/bee/cellar/'"$2"'/bin"' >> "/opt/bee/rc/beerc"
+                        echo "export PATH=\"\$PATH:/opt/bee/cellar/$2/bin\"" >> "/opt/bee/rc/beerc"
                     fi
 
                     if [ -d "/opt/bee/cellar/$2/include" ]; then
@@ -97,47 +76,30 @@ $HEADER_LINE
                         done
                     fi
                     ;;
-                "no"|"false"|"n"|"f")
-                    echo "Error: This package is not for macOS"
-                    ;;
-                *)
-                    echo "Error: Choice not found"
-                    ;;
+                "no"|"false"|"n"|"f") echo "Error: This package is not for macOS" ;;
+                *) echo "Error: Choice not found" ;;
             esac
         fi
 
         if [ "$(uname -s)" = "Linux" ]; then
             case "$linux" in
                 "yes"|"true"|"t"|"y")
-                    if [ -n "$homepage" ]; then
-                        echo "View all on $homepage"
-                    fi
-                    if [ -n "$discord" ]; then
-                        echo "Join my discord server -> $discord"
-                    fi
-        
+                    if [ -n "$homepage" ]; then echo "View all on $homepage"; fi
+                    if [ -n "$discord" ]; then echo "Join my discord server -> $discord"; fi
+                    
                     curl -s -L -R -O "$bin" "/opt/bee/cellar/$2.tgz"
-                    tar zxf "/opt/bee/cellar/$2.tgz" -C "/opt/bee/cellar/"
+                    tar zxf "/opt/bee/cellar/$2.tgz" -C "/opt/bee/cellar"
                     rm "/opt/bee/cellar/$2.tgz"
 
                     sudo mkdir -p "/opt/bee/packdoc/$2"
-
-                    if [ -n "$license" ]; then
-                        sudo curl -O "$license" "/opt/bee/packdoc/$2/license.md"
-                    fi
-                    if [ -n "$readme" ]; then
-                        sudo curl -O "$readme" "/opt/bee/packdoc/$2/readme.md"
-                    fi
-                    if [ -n "$manual" ]; then
-                        sudo curl -O "$manual" "/usr/local/share/man1/$2.1"
-                    fi
-                    if [ -n "$agents" ]; then
-                        sudo curl -O "$agents" "/opt/bee/packdoc/$2/agents.md"
-                    fi
+                    if [ -n "$license" ]; then sudo curl -O "$license" "/opt/bee/packdoc/$2/license.md"; fi
+                    if [ -n "$readme" ]; then sudo curl -O "$readme" "/opt/bee/packdoc/$2/readme.md"; fi
+                    if [ -n "$manual" ]; then sudo curl -O "$manual" "/usr/local/share/man1/$2.1"; fi
+                    if [ -n "$agents" ]; then sudo curl -O "$agents" "/opt/bee/packdoc/$2/agents.md"; fi
 
                     if [ -d "/opt/bee/cellar/$2/bin" ]; then
                         chmod -R +x "/opt/bee/cellar/$2/bin"
-                        echo 'export PATH="$PATH:/opt/bee/cellar/'"$2"'/bin"' >> "/opt/bee/rc/beerc"
+                        echo "export PATH=\"\$PATH:/opt/bee/cellar/$2/bin\"" >> "/opt/bee/rc/beerc"
                     fi
 
                     if [ -d "/opt/bee/cellar/$2/include" ]; then
@@ -148,21 +110,16 @@ $HEADER_LINE
                         done
                     fi
                     ;;
-                "no"|"false"|"n"|"f")
-                    echo "Error: This package is not for Linux"
-                    ;;
-                *)
-                    echo "Error: Choice not found"
-                    ;;
+                "no"|"false"|"n"|"f") echo "Error: This package is not for Linux" ;;
+                *) echo "Error: Choice not found" ;;
             esac
         fi   
         ;;
     "uninstall")
         if [ -z "$2" ]; then
-            echo "Usage: bee uninstall <package_name>"
+            echo "Usage: bee uninstall [package_name]"
             exit 1
         fi
-
         if [ -d "/opt/bee/cellar/$2" ]; then
             rm -rf "/opt/bee/cellar/$2"
             rm -f "/opt/bee/library/packages/$2.sh"
@@ -172,10 +129,9 @@ $HEADER_LINE
         ;;
     "create")
         if [ -z "$2" ]; then
-            echo "Usage: bee create <name>"
+            echo "Usage: bee create [name]"
             exit 1
         fi
-
 cat << 'EOS' > "/opt/bee/project/$2.sh"
 name="$2"
 discord=""
@@ -187,48 +143,32 @@ manual=""
 linux=""
 macos=""
 EOS
-
         vim "/opt/bee/project/$2.sh"
         ;;
     "test")
         if [ -z "$2" ]; then
-            echo "Usage: bee test <package_name>"
+            echo "Usage: bee test [package_name]"
             exit 1
         fi
-
         PACKAGE_NAME="$2"
         bash "/opt/bee/project/${PACKAGE_NAME}.sh"
         echo "==> Downloading binary..."
-
-        if [ -n "$homepage" ]; then
-            echo "View all on $homepage"
-        fi
-        if [ -n "$discord" ]; then
-            echo "Join my discord server -> $discord"
-        fi
+        if [ -n "$homepage" ]; then echo "View all on $homepage"; fi
+        if [ -n "$discord" ]; then echo "Join my discord server -> $discord"; fi
         
         curl -s -L -R -O "$bin" "/opt/bee/cellar/$2.tgz"
-        tar zxf "/opt/bee/cellar/$2.tgz" -C "/opt/bee/cellar/"
+        tar zxf "/opt/bee/cellar/$2.tgz" -C "/opt/bee/cellar"
         rm "/opt/bee/cellar/$2.tgz"
 
         sudo mkdir -p "/opt/bee/packdoc/$2"
-
-        if [ -n "$license" ]; then
-            sudo curl -O "$license" "/opt/bee/packdoc/$2/license.md"
-        fi
-        if [ -n "$readme" ]; then
-            sudo curl -O "$readme" "/opt/bee/packdoc/$2/readme.md"
-        fi
-        if [ -n "$manual" ]; then
-            sudo curl -O "$manual" "/usr/local/share/man1/$2.1"
-        fi
-        if [ -n "$agents" ]; then
-            sudo curl -O "$agents" "/opt/bee/packdoc/$2/agents.md"
-        fi
+        if [ -n "$license" ]; then sudo curl -O "$license" "/opt/bee/packdoc/$2/license.md"; fi
+        if [ -n "$readme" ]; then sudo curl -O "$readme" "/opt/bee/packdoc/$2/readme.md"; fi
+        if [ -n "$manual" ]; then sudo curl -O "$manual" "/usr/local/share/man1/$2.1"; fi
+        if [ -n "$agents" ]; then sudo curl -O "$agents" "/opt/bee/packdoc/$2/agents.md"; fi
 
         if [ -d "/opt/bee/cellar/$2/bin" ]; then
             chmod -R +x "/opt/bee/cellar/$2/bin"
-            echo 'export PATH="$PATH:/opt/bee/cellar/'"$2"'/bin"' >> "/opt/bee/rc/beerc"
+            echo "export PATH=\"\$PATH:/opt/bee/cellar/$2/bin\"" >> "/opt/bee/rc/beerc"
         fi
 
         if [ -d "/opt/bee/cellar/$2/include" ]; then
@@ -241,10 +181,9 @@ EOS
         ;;
     "edit")
         if [ -z "$2" ]; then
-            echo "Usage: bee edit <package_name>"
+            echo "Usage: bee edit [package_name]"
             exit 1
         fi
-
         if [ -f "/opt/bee/project/$2.sh" ]; then
             vim "/opt/bee/project/$2.sh"
         else
@@ -253,10 +192,9 @@ EOS
         ;;
     "delete-project")
         if [ -z "$2" ]; then
-            echo "Usage: bee delete-project <package_name>"
+            echo "Usage: bee delete-project [package_name]"
             exit 1
         fi
-
         if [ -f "/opt/bee/project/$2.sh" ]; then
             sudo rm "/opt/bee/project/$2.sh"
         else
@@ -268,7 +206,6 @@ EOS
             cat "/opt/bee/doc/readme.md"
             exit 0
         fi
-
         if [ -f "/opt/bee/packdoc/$2/readme.md" ]; then
             cat "/opt/bee/packdoc/$2/readme.md"
         else
@@ -280,7 +217,6 @@ EOS
             cat "/opt/bee/doc/license.md"
             exit 0
         fi
-
         if [ -f "/opt/bee/packdoc/$2/license.md" ]; then
             cat "/opt/bee/packdoc/$2/license.md"
         else
@@ -292,9 +228,8 @@ EOS
             cat "/opt/bee/doc/manual.md"
             exit 0
         fi
-
         if [ -f "/usr/local/share/man1/$2.1" ]; then
-            man $2
+            man "$2"
         else
             echo "Error: No manual found for: $2"
         fi
@@ -304,7 +239,6 @@ EOS
             cat "/opt/bee/doc/agents.md"
             exit 0
         fi
-
         if [ -f "/opt/bee/packdoc/$2/agents.md" ]; then
             cat "/opt/bee/packdoc/$2/agents.md"
         else
@@ -313,16 +247,13 @@ EOS
         ;;
     "publish")
         if [ -z "$2" ]; then
-            echo "Usage: bee publish <package_name>"
+            echo "Usage: bee publish [package_name]"
             exit 1
         fi
-
         SOURCE_PATH="/opt/bee/project/$2.sh"
         TARGET_DIR="/opt/bee/admin/packages"
-
         TARGET_USER=$(awk -F: -v dir="$TARGET_DIR" '$6 == dir {print $1; exit}' /etc/passwd)
         [ -z "$TARGET_USER" ] && TARGET_USER="root"
-
         if sudo cp "$SOURCE_PATH" "$TARGET_DIR/$2.sh"; then
             sudo chown "$TARGET_USER":"$TARGET_USER" "$TARGET_DIR/$2.sh"
         fi
@@ -353,12 +284,11 @@ EOS
         ;;
     "search")
         if [ -z "$2" ]; then
-            echo "Usage: bee search <package_name>"
+            echo "Usage: bee search [package_name]"
             exit 1
         fi
         TARGET_PATH="/opt/bee/admin/packages"
         SEARCH_KEYWORD="$2"
- 
         find "$TARGET_PATH" -maxdepth 1 -type f -name "*$SEARCH_KEYWORD*" 2>/dev/null | while read -r filepath; do
             filename=$(basename "$filepath")
             echo "${filename%.*}"
@@ -380,12 +310,12 @@ echo "==> Making doc..."
 sudo tee "/opt/bee/doc/help.md" > /dev/null << 'EOF'
 bee:
 
-install <package_name>
-uninstall <package_name>
-create <package_name>
-edit <package_name>
+install [package_name]
+uninstall [package_name]
+create [package_name]
+edit [package_name]
 rc
-search <package_name>
+search [package_name]
 packages-list
 my-packages-list
 help
@@ -547,7 +477,7 @@ sudo tee "/opt/bee/doc/manual.md" > /dev/null << 'EOF'
 ## SYNOPSIS
 
 ```
- bee <command> [arguments] [options]
+ bee [command] [arguments] [options]
 
 ```
 
@@ -588,7 +518,7 @@ sudo tee "/usr/local/share/man/man1/bee.1" > /dev/null << 'EOF'
 bee - a command-line tool for managing Bee packages and development environments
 .SH SYNOPSIS
 .B bee
-.I 
+.I "[command]"
 [\ imperatives/arguments\ ]
 [\ options\ ]
 .SH DESCRIPTION
@@ -614,10 +544,18 @@ echo "==> Allowing executable permissions..."
 sudo chmod +x "/opt/bee/bin/bee"
 
 echo "==> Adding executable file to terminal system..."
-echo 'export PATH="$PATH:/opt/bee/bin"' | sudo tee -a "/opt/bee/rc/beerc" > /dev/null
-echo 'bee rc 2>/dev/null' >> "$HOME/.bashrc"
-echo 'bee rc 2>/dev/null' >> "$HOME/.zshrc"
+if ! grep -q 'export PATH="/opt/bee/bin:$PATH"' "$HOME/.bashrc" 2>/dev/null; then
+echo 'export PATH="/opt/bee/bin:$PATH"' >> "$HOME/.bashrc"
+fi
+if ! grep -q 'source /opt/bee/rc/beerc 2>/dev/null' "$HOME/.bashrc" 2>/dev/null; then
+echo 'source /opt/bee/rc/beerc 2>/dev/null' >> "$HOME/.bashrc"
+fi
+
+if ! grep -q 'export PATH="/opt/bee/bin:$PATH"' "$HOME/.zshrc" 2>/dev/null; then
+echo 'export PATH="/opt/bee/bin:$PATH"' >> "$HOME/.zshrc"
+fi
+if ! grep -q 'source /opt/bee/rc/beerc 2>/dev/null' "$HOME/.zshrc" 2>/dev/null; then
+echo 'source /opt/bee/rc/beerc 2>/dev/null' >> "$HOME/.zshrc"
+fi
 
 echo "==> Installed done!"
-echo "Please restart your terminal or run 'source ~/.bashrc' or 'source ~/.zshrc' manually."
-```
