@@ -6,6 +6,14 @@ Built with performance in mind, **bee** optimizes disk space using a centralized
 
 ---
 
+## ⬇️ Installation
+
+Run this on your Terminal:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/LT5B/bee/refs/heads/main/install.sh)"
+```
+
 ## ⚡ Key Features
 
 * **Ultra-Fast Installation**: Utilizes concurrent downloading and parallel extraction.
