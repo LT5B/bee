@@ -509,3 +509,4 @@ Custom agent hooks can be initialized by adding them to the global `bee.toml` or
 [agents.custom-validator]
 exec = "/opt/bee/bin/bee"
 sandbox = true
+EOF
