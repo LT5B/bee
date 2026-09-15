@@ -5,6 +5,7 @@ sudo mkdir -p "/opt/bee"
 sudo mkdir -p "/opt/bee/bin"
 sudo mkdir -p "/opt/bee/cellar"
 sudo mkdir -p "/opt/bee/doc"
+sudo mkdir -p "/opt/bee/applications"
 sudo mkdir -p "/opt/bee/project"
 sudo mkdir -p "/opt/bee/packdoc"
 sudo mkdir -p "/opt/bee/rc"
@@ -509,4 +510,114 @@ Custom agent hooks can be initialized by adding them to the global `bee.toml` or
 [agents.custom-validator]
 exec = "/opt/bee/bin/bee"
 sandbox = true
+
+```
+
+### Agent Lifecycle Hooks
+
+Agents listen to specific ecosystem event streams emitted by the core:
+
+| Hook Event | Executing Agent | Expected Action |
+| --- | --- | --- |
+| `on_resolve` | `bee-resolver-agent` | Emits validated JSON package graphs. |
+| `pre_fetch` | `bee-sync-agent` | Validates mirror endpoints availability. |
+| `post_fetch` | `bee-guard-agent` | Computes and validates binary checksums. |
+| `on_extract` | `bee-worker-agent` | Handles filesystem deployment and symlinks. |
+
+## 4. Error Handling & Fail-safe Mode
+
+If an agent misbehaves, freezes, or fails an execution check, `bee` triggers the **Default Fail-safe Circuit**:
+
+1. **Isolation:** The faulty agent process is safely sent a `SIGTERM` (and `SIGKILL` after 5 seconds).
+2. **Fallback:** Tasks are handed over to the synchronous native fallback engine inside the `bee` core.
+3. **Telemetry:** Diagnostics are recorded in `~/.bee/logs/agents.err.log`.
 EOF
+
+sudo tee "/opt/bee/doc/manual.md" > /dev/null << 'EOF'
+
+# BEE(1) - User Commands Manual
+
+## NAME
+
+```
+ bee - a command-line tool for managing Bee packages and development environments
+
+```
+
+## SYNOPSIS
+
+```
+ bee <command> [arguments] [options]
+
+```
+
+## DESCRIPTION
+
+```
+ The bee utility is a high-performance package manager designed to initialize, 
+ install, update, and manage dependencies for Bee-based applications. It automates 
+ environment setup, resolves semantic versioning, and provides a unified interface 
+ for project development.
+
+```
+
+## COMMANDS AND OPTIONS
+
+```
+ help
+         Display the help menu and a summary of available commands.
+
+ update
+         Refresh the Bee package manager
+
+ install
+         Install a package
+
+ uninstall
+         Remove a package
+ v.v.
+
+```
+
+EOF
+
+sudo mkdir -p /usr/local/share/man/man1
+sudo tee "/usr/local/share/man/man1/bee.1" > /dev/null << 'EOF'
+.TH BEE 1 "September 2026" "Bee Manual" "User Commands Manual"
+.SH NAME
+bee - a command-line tool for managing Bee packages and development environments
+.SH SYNOPSIS
+.B bee
+.I 
+[\ imperatives/arguments\ ]
+[\ options\ ]
+.SH DESCRIPTION
+The
+.B bee
+utility is a high-performance package manager designed to initialize, install, update, and manage dependencies for Bee-based applications. It automates environment setup, resolves semantic versioning, and provides a unified interface for project development.
+.SH COMMANDS
+.TP
+.B help
+Display the help menu and a summary of available commands.
+.TP
+.B update
+Refresh the Bee package manager.
+.TP
+.B install
+Install a package.
+.TP
+.B uninstall
+Remove a package.
+EOF
+
+echo "==> Allowing executable permissions..."
+sudo chmod +x "/opt/bee/bin/bee"
+
+echo "==> Adding executable file to terminal system..."
+echo 'export PATH="$PATH:/opt/bee/bin"' | sudo tee -a "/opt/bee/rc/beerc" > /dev/null
+echo 'bee rc 2>/dev/null' >> "$HOME/.bashrc"
+echo 'bee rc 2>/dev/null' >> "$HOME/.zshrc"
+
+echo "==> Installed done!"
+echo "Please restart your terminal or run 'source ~/.bashrc' or 'source ~/.zshrc' manually."
+```
